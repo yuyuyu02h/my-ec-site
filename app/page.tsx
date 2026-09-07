@@ -1,33 +1,17 @@
 import Link from "next/link";
+import { supabase } from "@/lib/supabase";
 
-const products = [
-  {
-    id: 1,
-    name: "PRODUCT ONE",
-    price: "¥5,000",
-    description: "Product description goes here.",
-  },
-  {
-    id: 2,
-    name: "PRODUCT TWO",
-    price: "¥6,000",
-    description: "Product description goes here.",
-  },
-  {
-    id: 3,
-    name: "PRODUCT THREE",
-    price: "¥5,000",
-    description: "Product description goes here.",
-  },
-  {
-    id: 4,
-    name: "PRODUCT FOUR",
-    price: "¥7,000",
-    description: "Product description goes here.",
-  },
-];
+export default async function Home() {
+  const { data: products, error } = await supabase
+    .from("products")
+    .select("*")
+    .eq("is_available", true)
+    .order("id");
 
-export default function Home() {
+  if (error) {
+    console.error("Supabase error:", error);
+  }
+
   return (
     <main className="min-h-screen bg-white text-black">
       {/* Header */}
@@ -78,15 +62,15 @@ export default function Home() {
             </div>
 
             <p className="text-sm text-gray-500">
-              4 PRODUCTS
+              {products?.length ?? 0} PRODUCTS
             </p>
           </div>
 
           <div className="grid grid-cols-1 gap-8 md:grid-cols-2">
-            {products.map((product) => (
+            {products?.map((product) => (
               <article key={product.id}>
                 {/* Product Image */}
-                <div className="aspect-[4/5] bg-gray-100 flex items-center justify-center">
+                <div className="flex aspect-[4/5] items-center justify-center bg-gray-100">
                   <span className="text-sm text-gray-400">
                     PRODUCT IMAGE
                   </span>
@@ -106,18 +90,21 @@ export default function Home() {
                     </div>
 
                     <p className="whitespace-nowrap text-sm">
-                      {product.price}
+                      ¥{product.price.toLocaleString()}
                     </p>
                   </div>
 
                   <div className="mt-5 flex items-center justify-between border-t border-gray-200 pt-4">
                     <p className="text-sm">
-                      SIZE: <span className="font-semibold">L</span>
+                      SIZE:{" "}
+                      <span className="font-semibold">
+                        {product.size}
+                      </span>
                     </p>
 
-                  <Link
-                    href={`/products/${product.id}`}
-                    className="border border-black px-6 py-3 text-sm font-medium transition hover:bg-black hover:text-white"
+                    <Link
+                      href={`/products/${product.id}`}
+                      className="border border-black px-6 py-3 text-sm font-medium transition hover:bg-black hover:text-white"
                     >
                       VIEW PRODUCT
                     </Link>

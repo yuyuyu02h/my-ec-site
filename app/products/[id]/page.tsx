@@ -1,35 +1,7 @@
 import Link from "next/link";
-
-const products = [
-  {
-    id: "1",
-    name: "PRODUCT ONE",
-    price: "¥5,000",
-    description:
-      "Product description goes here. Replace this text with the actual product description.",
-  },
-  {
-    id: "2",
-    name: "PRODUCT TWO",
-    price: "¥6,000",
-    description:
-      "Product description goes here. Replace this text with the actual product description.",
-  },
-  {
-    id: "3",
-    name: "PRODUCT THREE",
-    price: "¥5,000",
-    description:
-      "Product description goes here. Replace this text with the actual product description.",
-  },
-  {
-    id: "4",
-    name: "PRODUCT FOUR",
-    price: "¥7,000",
-    description:
-      "Product description goes here. Replace this text with the actual product description.",
-  },
-];
+import { notFound } from "next/navigation";
+import { supabase } from "@/lib/supabase";
+import BuyButton from "./BuyButton";
 
 type Props = {
   params: Promise<{
@@ -40,23 +12,15 @@ type Props = {
 export default async function ProductPage({ params }: Props) {
   const { id } = await params;
 
-  const product = products.find((item) => item.id === id);
+  const { data: product, error } = await supabase
+    .from("products")
+    .select("*")
+    .eq("id", id)
+    .eq("is_available", true)
+    .single();
 
-  if (!product) {
-    return (
-      <main className="min-h-screen bg-white px-6 py-24 text-black">
-        <div className="mx-auto max-w-3xl">
-          <h1 className="text-3xl font-bold">PRODUCT NOT FOUND</h1>
-
-          <Link
-            href="/"
-            className="mt-8 inline-block underline"
-          >
-            Back to Home
-          </Link>
-        </div>
-      </main>
-    );
+  if (error || !product) {
+    notFound();
   }
 
   return (
@@ -85,7 +49,7 @@ export default async function ProductPage({ params }: Props) {
       <section className="px-6 py-16 md:py-24">
         <div className="mx-auto grid max-w-6xl grid-cols-1 gap-12 md:grid-cols-2">
           {/* Image */}
-          <div className="aspect-[4/5] bg-gray-100 flex items-center justify-center">
+          <div className="flex aspect-[4/5] items-center justify-center bg-gray-100">
             <span className="text-sm text-gray-400">
               PRODUCT IMAGE
             </span>
@@ -102,7 +66,7 @@ export default async function ProductPage({ params }: Props) {
             </h1>
 
             <p className="mt-5 text-lg">
-              {product.price}
+              ¥{product.price.toLocaleString()}
             </p>
 
             <div className="mt-10 border-t border-gray-200 pt-8">
@@ -114,10 +78,12 @@ export default async function ProductPage({ params }: Props) {
             {/* Size */}
             <div className="mt-8 border-t border-gray-200 pt-6">
               <div className="flex items-center justify-between">
-                <span className="text-sm">SIZE</span>
+                <span className="text-sm">
+                  SIZE
+                </span>
 
                 <span className="text-sm font-semibold">
-                  L
+                  {product.size}
                 </span>
               </div>
             </div>
@@ -136,12 +102,11 @@ export default async function ProductPage({ params }: Props) {
             </div>
 
             {/* Buy */}
-            <button
-              type="button"
-              className="mt-10 w-full border border-black bg-black px-6 py-4 text-sm font-medium text-white transition hover:bg-white hover:text-black"
-            >
-              BUY NOW
-            </button>
+<BuyButton
+  productId={product.id}
+  name={product.name}
+  price={product.price}
+/>
 
             <Link
               href="/#products"
