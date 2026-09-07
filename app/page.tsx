@@ -1,82 +1,132 @@
+const products = [
+  {
+    id: 1,
+    name: "PRODUCT ONE",
+    price: "¥5,000",
+    description: "Product description goes here.",
+  },
+  {
+    id: 2,
+    name: "PRODUCT TWO",
+    price: "¥6,000",
+    description: "Product description goes here.",
+  },
+  {
+    id: 3,
+    name: "PRODUCT THREE",
+    price: "¥5,000",
+    description: "Product description goes here.",
+  },
+  {
+    id: 4,
+    name: "PRODUCT FOUR",
+    price: "¥7,000",
+    description: "Product description goes here.",
+  },
+];
+
 export default function Home() {
   return (
     <main className="min-h-screen bg-white text-black">
       {/* Header */}
-      <header className="border-b border-gray-200">
-        <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-6">
-          <a href="/" className="text-xl font-bold tracking-widest">
-            BRAND NAME
+      <header className="flex items-center justify-between border-b border-black px-6 py-5">
+        <h1 className="text-xl font-bold tracking-widest">
+          BRAND NAME
+        </h1>
+
+        <nav className="flex gap-8 text-sm">
+          <a href="#products" className="hover:underline">
+            PRODUCT
           </a>
 
-          <nav className="flex items-center gap-6 text-sm">
-            <a href="#product" className="hover:opacity-60">
-              PRODUCT
-            </a>
-            <a href="#about" className="hover:opacity-60">
-              ABOUT
-            </a>
-          </nav>
-        </div>
+          <a href="#about" className="hover:underline">
+            ABOUT
+          </a>
+        </nav>
       </header>
 
       {/* Hero */}
-      <section className="mx-auto max-w-6xl px-6 py-16 md:py-24">
-        <div className="grid items-center gap-12 md:grid-cols-2">
-          {/* Product Image */}
-          <div className="aspect-square bg-gray-100">
-            <div className="flex h-full items-center justify-center text-sm text-gray-400">
-              PRODUCT IMAGE
+      <section className="px-6 py-24 text-center">
+        <p className="mb-4 text-sm tracking-[0.3em]">
+          NEW COLLECTION
+        </p>
+
+        <h2 className="text-5xl font-bold tracking-tight md:text-7xl">
+          BRAND NAME
+        </h2>
+
+        <p className="mx-auto mt-6 max-w-xl text-sm leading-7 text-gray-600">
+          Original clothing created with a focus on simplicity,
+          individuality and everyday wear.
+        </p>
+      </section>
+
+      {/* Products */}
+      <section id="products" className="px-6 pb-24">
+        <div className="mx-auto max-w-6xl">
+          <div className="mb-10 flex items-end justify-between">
+            <div>
+              <p className="text-xs tracking-[0.25em] text-gray-500">
+                COLLECTION
+              </p>
+
+              <h2 className="mt-2 text-3xl font-bold">
+                PRODUCTS
+              </h2>
             </div>
+
+            <p className="text-sm text-gray-500">
+              4 PRODUCTS
+            </p>
           </div>
 
-          {/* Product Information */}
-          <div id="product">
-            <p className="mb-4 text-xs tracking-[0.3em] text-gray-500">
-              NEW COLLECTION
-            </p>
+          <div className="grid grid-cols-1 gap-8 md:grid-cols-2">
+            {products.map((product) => (
+              <article key={product.id}>
+                {/* Product Image */}
+                <div className="aspect-[4/5] bg-gray-100 flex items-center justify-center">
+                  <span className="text-sm text-gray-400">
+                    PRODUCT IMAGE
+                  </span>
+                </div>
 
-            <h1 className="text-3xl font-medium tracking-wide md:text-4xl">
-              PRODUCT NAME
-            </h1>
+                {/* Product Information */}
+                <div className="pt-5">
+                  <div className="flex items-start justify-between gap-4">
+                    <div>
+                      <h3 className="text-lg font-semibold">
+                        {product.name}
+                      </h3>
 
-            <p className="mt-6 text-xl">
-              ¥5,000
-            </p>
+                      <p className="mt-2 text-sm text-gray-600">
+                        {product.description}
+                      </p>
+                    </div>
 
-            <div className="mt-8 border-t border-gray-200 pt-8">
-              <p className="text-sm leading-7 text-gray-600">
-                ここに商品の説明を入れます。
-                <br />
-                商品の特徴、素材、サイズ感などを記載します。
-              </p>
-            </div>
+                    <p className="whitespace-nowrap text-sm">
+                      {product.price}
+                    </p>
+                  </div>
 
-            {/* Size */}
-            <div className="mt-8">
-              <p className="mb-3 text-sm font-medium">
-                SIZE
-              </p>
+                  <div className="mt-5 flex items-center justify-between border-t border-gray-200 pt-4">
+                    <p className="text-sm">
+                      SIZE: <span className="font-semibold">L</span>
+                    </p>
 
-              <div className="flex gap-2">
-                {["S", "M", "L", "XL"].map((size) => (
-                  <button
-                    key={size}
-                    className="h-11 w-14 border border-gray-300 text-sm transition hover:border-black"
-                  >
-                    {size}
-                  </button>
-                ))}
-              </div>
-            </div>
+                    <button
+                      type="button"
+                      className="border border-black px-6 py-3 text-sm font-medium transition hover:bg-black hover:text-white"
+                    >
+                      BUY NOW
+                    </button>
+                  </div>
 
-            {/* Purchase Button */}
-            <button className="mt-8 w-full bg-black py-4 text-sm font-medium tracking-widest text-white transition hover:bg-gray-800">
-              BUY NOW
-            </button>
-
-            <p className="mt-4 text-center text-xs text-gray-400">
-              受注生産 / ご注文後に製作します
-            </p>
+                  <p className="mt-3 text-xs text-gray-500">
+                    MADE TO ORDER
+                  </p>
+                </div>
+              </article>
+            ))}
           </div>
         </div>
       </section>
@@ -84,34 +134,36 @@ export default function Home() {
       {/* About */}
       <section
         id="about"
-        className="border-t border-gray-200 bg-gray-50 px-6 py-20"
+        className="border-t border-black px-6 py-24"
       >
-        <div className="mx-auto max-w-3xl text-center">
-          <p className="text-xs tracking-[0.3em] text-gray-500">
+        <div className="mx-auto max-w-3xl">
+          <p className="text-xs tracking-[0.25em] text-gray-500">
             ABOUT
           </p>
 
-          <h2 className="mt-4 text-2xl font-medium">
+          <h2 className="mt-3 text-3xl font-bold">
             BRAND CONCEPT
           </h2>
 
-          <p className="mt-8 text-sm leading-8 text-gray-600">
-            ここにブランドコンセプトを記載します。
+          <p className="mt-8 text-sm leading-8 text-gray-700">
+            This is the brand concept.
             <br />
-            ブランドの考え方や商品の背景などを説明できます。
+            Replace this text with your actual brand story,
+            philosophy and concept.
           </p>
         </div>
       </section>
 
       {/* Footer */}
-      <footer className="border-t border-gray-200 px-6 py-8">
-        <div className="mx-auto flex max-w-6xl flex-col gap-4 text-xs text-gray-500 md:flex-row md:items-center md:justify-between">
+      <footer className="border-t border-black px-6 py-8">
+        <div className="flex flex-col gap-4 text-xs text-gray-500 md:flex-row md:items-center md:justify-between">
           <p>© 2026 BRAND NAME</p>
 
           <div className="flex gap-6">
             <a href="#" className="hover:text-black">
               特定商取引法に基づく表記
             </a>
+
             <a href="#" className="hover:text-black">
               プライバシーポリシー
             </a>
