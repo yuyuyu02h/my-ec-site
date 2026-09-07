@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 const products = [
   {
     id: 1,
@@ -113,12 +115,12 @@ export default function Home() {
                       SIZE: <span className="font-semibold">L</span>
                     </p>
 
-                    <button
-                      type="button"
-                      className="border border-black px-6 py-3 text-sm font-medium transition hover:bg-black hover:text-white"
+                  <Link
+                    href={`/products/${product.id}`}
+                    className="border border-black px-6 py-3 text-sm font-medium transition hover:bg-black hover:text-white"
                     >
-                      BUY NOW
-                    </button>
+                      VIEW PRODUCT
+                    </Link>
                   </div>
 
                   <p className="mt-3 text-xs text-gray-500">
