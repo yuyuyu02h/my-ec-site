@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useState } from "react";
 import StoreHeader from "@/app/components/StoreHeader";
 import { MAX_ITEM_QUANTITY } from "@/lib/cart";
+import { createCheckoutUrl } from "@/lib/checkoutClient";
 import { useCart } from "./CartProvider";
 
 export default function CartPage() {
@@ -21,25 +22,11 @@ export default function CartPage() {
     try {
       setIsCheckingOut(true);
 
-      const response = await fetch("/api/checkout", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          items: items.map(({ productId, quantity }) => ({
-            productId,
-            quantity,
-          })),
-        }),
-      });
-      const data = await response.json();
+      const checkoutUrl = await createCheckoutUrl(
+        items.map(({ productId, quantity }) => ({ productId, quantity }))
+      );
 
-      if (!response.ok || typeof data.url !== "string") {
-        throw new Error("Checkout session creation failed");
-      }
-
-      window.location.href = data.url;
+      window.location.href = checkoutUrl;
     } catch (error) {
       console.error(error);
       alert("決済ページの作成に失敗しました。商品情報をご確認ください。");
