@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import StoreHeader from "@/app/components/StoreHeader";
 import { supabase } from "@/lib/supabase";
 import BuyButton from "./BuyButton";
 
@@ -25,25 +26,7 @@ export default async function ProductPage({ params }: Props) {
 
   return (
     <main className="min-h-screen bg-white text-black">
-      {/* Header */}
-      <header className="flex items-center justify-between border-b border-black px-6 py-5">
-        <Link
-          href="/"
-          className="text-xl font-bold tracking-widest"
-        >
-          BRAND NAME
-        </Link>
-
-        <nav className="flex gap-8 text-sm">
-          <Link href="/#products" className="hover:underline">
-            PRODUCT
-          </Link>
-
-          <Link href="/#about" className="hover:underline">
-            ABOUT
-          </Link>
-        </nav>
-      </header>
+      <StoreHeader />
 
       {/* Product */}
       <section className="px-6 py-16 md:py-24">
@@ -101,12 +84,13 @@ export default async function ProductPage({ params }: Props) {
               </div>
             </div>
 
-            {/* Buy */}
-<BuyButton
-  productId={product.id}
-  name={product.name}
-  price={product.price}
-/>
+            {/* Cart */}
+            <BuyButton
+              productId={product.id}
+              name={product.name}
+              price={product.price}
+              size={product.size}
+            />
 
             <Link
               href="/#products"

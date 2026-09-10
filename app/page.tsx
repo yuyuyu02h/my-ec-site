@@ -1,4 +1,5 @@
 import Link from "next/link";
+import StoreHeader from "@/app/components/StoreHeader";
 import { supabase } from "@/lib/supabase";
 
 export default async function Home() {
@@ -14,22 +15,7 @@ export default async function Home() {
 
   return (
     <main className="min-h-screen bg-white text-black">
-      {/* Header */}
-      <header className="flex items-center justify-between border-b border-black px-6 py-5">
-        <h1 className="text-xl font-bold tracking-widest">
-          BRAND NAME
-        </h1>
-
-        <nav className="flex gap-8 text-sm">
-          <a href="#products" className="hover:underline">
-            PRODUCT
-          </a>
-
-          <a href="#about" className="hover:underline">
-            ABOUT
-          </a>
-        </nav>
-      </header>
+      <StoreHeader />
 
       {/* Hero */}
       <section className="px-6 py-24 text-center">

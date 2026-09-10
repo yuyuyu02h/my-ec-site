@@ -1,8 +1,18 @@
 import Link from "next/link";
+import ClearCart from "./ClearCart";
 
-export default function SuccessPage() {
+type Props = {
+  searchParams: Promise<{
+    session_id?: string;
+  }>;
+};
+
+export default async function SuccessPage({ searchParams }: Props) {
+  const { session_id: sessionId } = await searchParams;
+
   return (
     <main className="min-h-screen bg-white px-6 py-24 text-black">
+      <ClearCart shouldClear={Boolean(sessionId)} />
       <div className="mx-auto max-w-2xl text-center">
         <p className="text-xs tracking-[0.25em] text-gray-500">
           ORDER COMPLETE

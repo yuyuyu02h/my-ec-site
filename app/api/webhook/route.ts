@@ -1,9 +1,73 @@
 import { NextRequest, NextResponse } from "next/server";
 import Stripe from "stripe";
+import {
+  CheckoutItem,
+  MAX_DISTINCT_ITEMS,
+  MAX_ITEM_QUANTITY,
+  MAX_TOTAL_QUANTITY,
+} from "@/lib/cart";
 import { supabaseAdmin } from "@/lib/supabaseAdmin";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
 const cryptoProvider = Stripe.createSubtleCryptoProvider();
+
+function parseCartMetadata(metadata: Stripe.Metadata | null): CheckoutItem[] | null {
+  const rawCart = metadata?.cart;
+
+  if (!rawCart) {
+    const legacyProductId = Number(metadata?.productId);
+
+    return Number.isSafeInteger(legacyProductId) && legacyProductId > 0
+      ? [{ productId: legacyProductId, quantity: 1 }]
+      : null;
+  }
+
+  try {
+    const parsed: unknown = JSON.parse(rawCart);
+
+    if (
+      !Array.isArray(parsed) ||
+      parsed.length === 0 ||
+      parsed.length > MAX_DISTINCT_ITEMS
+    ) {
+      return null;
+    }
+
+    const items = parsed.map((value) => {
+      if (!value || typeof value !== "object") {
+        return null;
+      }
+
+      const { id, q } = value as { id?: unknown; q?: unknown };
+
+      if (
+        !Number.isSafeInteger(id) ||
+        !Number.isInteger(q) ||
+        Number(id) <= 0 ||
+        Number(q) < 1 ||
+        Number(q) > MAX_ITEM_QUANTITY
+      ) {
+        return null;
+      }
+
+      return { productId: Number(id), quantity: Number(q) };
+    });
+
+    if (items.some((item) => item === null)) {
+      return null;
+    }
+
+    const validatedItems = items as CheckoutItem[];
+    const totalQuantity = validatedItems.reduce(
+      (total, item) => total + item.quantity,
+      0
+    );
+
+    return totalQuantity <= MAX_TOTAL_QUANTITY ? validatedItems : null;
+  } catch {
+    return null;
+  }
+}
 
 export async function POST(req: NextRequest) {
   const body = await req.text();
@@ -39,31 +103,46 @@ export async function POST(req: NextRequest) {
   if (event.type === "checkout.session.completed") {
     const session = event.data.object as Stripe.Checkout.Session;
 
-    const productId = session.metadata?.productId;
+    const cartItems = parseCartMetadata(session.metadata);
 
-    if (!productId) {
-      console.error("Missing productId in Stripe metadata");
+    if (!cartItems) {
+      console.error("Missing or invalid cart metadata");
 
       return NextResponse.json(
-        { error: "Missing productId" },
+        { error: "Invalid cart metadata" },
         { status: 400 }
       );
     }
 
-    const { data: product, error: productError } = await supabaseAdmin
+    const productIds = cartItems.map((item) => item.productId);
+    const { data: products, error: productError } = await supabaseAdmin
       .from("products")
       .select("id, name")
-      .eq("id", productId)
-      .single();
+      .in("id", productIds);
 
-    if (productError || !product) {
+    if (
+      productError ||
+      !products ||
+      products.length !== productIds.length
+    ) {
       console.error("Product lookup failed:", productError);
 
       return NextResponse.json(
-        { error: "Product not found" },
+        { error: "One or more products were not found" },
         { status: 500 }
       );
     }
+
+    const productsById = new Map(
+      products.map((product) => [Number(product.id), product])
+    );
+    const productSummary = cartItems
+      .map((item) => {
+        const product = productsById.get(item.productId);
+
+        return `${product!.name} x ${item.quantity}`;
+      })
+      .join(" / ");
 
     const customerName = session.customer_details?.name ?? null;
     const address = session.customer_details?.address;
@@ -87,8 +166,8 @@ export async function POST(req: NextRequest) {
       .upsert(
         {
           stripe_session_id: session.id,
-          product_id: product.id,
-          product_name: product.name,
+          product_id: cartItems[0].productId,
+          product_name: productSummary,
           amount: session.amount_total ?? 0,
           customer_email: session.customer_details?.email ?? null,
           customer_name: customerName,

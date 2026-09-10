@@ -1,7 +1,11 @@
 # my-ec-site
 
 Next.js 16 ecommerce site using Supabase for products, authentication, and
-orders, with Stripe Checkout and Stripe webhooks for payment processing.
+orders, with a persistent shopping cart, Stripe Checkout, and Stripe webhooks
+for payment processing.
+
+The cart supports multiple products and quantities. Checkout prices and product
+availability are always revalidated against Supabase on the server.
 
 ## Local development
 
