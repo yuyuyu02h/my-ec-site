@@ -1,36 +1,61 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# my-ec-site
 
-## Getting Started
+Next.js 16 ecommerce site using Supabase for products, authentication, and
+orders, with Stripe Checkout and Stripe webhooks for payment processing.
 
-First, run the development server:
+## Local development
+
+Run the standard Next.js development server:
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Run the application in the Cloudflare-compatible vinext development server:
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```bash
+npm run dev:vinext
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Environment variables
 
-## Learn More
+The application requires these environment variable names:
 
-To learn more about Next.js, take a look at the following resources:
+```text
+NEXT_PUBLIC_SUPABASE_URL
+NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY
+SUPABASE_SECRET_KEY
+STRIPE_SECRET_KEY
+STRIPE_WEBHOOK_SECRET
+ADMIN_EMAILS
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Do not commit environment files or secret values.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Verification
 
-## Deploy on Vercel
+```bash
+npm run lint
+npx tsc --noEmit
+npm run build:vinext
+```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+The original Next.js build remains available with `npm run build`.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Cloudflare Workers
+
+Preview the production Worker locally after building:
+
+```bash
+npm run start:vinext
+```
+
+Deploy the Worker:
+
+```bash
+npm run deploy:vinext
+```
+
+Configure the environment variable names listed above in Cloudflare before
+using the deployed application. Stripe must have a webhook endpoint targeting
+`/api/webhook` with the `checkout.session.completed` event enabled.

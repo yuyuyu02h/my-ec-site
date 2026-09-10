@@ -3,6 +3,7 @@ import Stripe from "stripe";
 import { supabaseAdmin } from "@/lib/supabaseAdmin";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
+const cryptoProvider = Stripe.createSubtleCryptoProvider();
 
 export async function POST(req: NextRequest) {
   const body = await req.text();
@@ -19,10 +20,12 @@ export async function POST(req: NextRequest) {
   let event: Stripe.Event;
 
   try {
-    event = stripe.webhooks.constructEvent(
+    event = await stripe.webhooks.constructEventAsync(
       body,
       signature,
-      process.env.STRIPE_WEBHOOK_SECRET!
+      process.env.STRIPE_WEBHOOK_SECRET!,
+      undefined,
+      cryptoProvider
     );
   } catch (error) {
     console.error("Webhook signature verification failed:", error);
